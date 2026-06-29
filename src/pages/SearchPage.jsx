@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useFavourites } from '../context/FavouritesContext'
 
 const API_KEY = import.meta.env.VITE_RAWG_API_KEY
 
@@ -6,6 +7,7 @@ function SearchPage() {
   const [query, setQuery] = useState('')
   const [games, setGames] = useState([])
   const [loading, setLoading] = useState(false)
+  const { addFavourite, removeFavourite, isFavourite } = useFavourites()
 
   const searchGames = async () => {
     if (!query) return
@@ -16,6 +18,14 @@ function SearchPage() {
     const data = await response.json()
     setGames(data.results)
     setLoading(false)
+  }
+
+  const handleFavourite = (game) => {
+    if (isFavourite(game.id)) {
+      removeFavourite(game.id)
+    } else {
+      addFavourite(game)
+    }
   }
 
   return (
@@ -51,6 +61,16 @@ function SearchPage() {
             <div className="p-4">
               <h2 className="text-white font-semibold">{game.name}</h2>
               <p className="text-gray-400 text-sm mt-1">⭐ {game.rating}</p>
+              <button
+                onClick={() => handleFavourite(game)}
+                className={`mt-3 w-full py-2 rounded-lg text-sm font-medium ${
+                  isFavourite(game.id)
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {isFavourite(game.id) ? '♥ Saved' : '♡ Save'}
+              </button>
             </div>
           </div>
         ))}

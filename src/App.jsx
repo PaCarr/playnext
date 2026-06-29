@@ -1,7 +1,16 @@
+import { Routes, Route } from 'react-router-dom'
+import SearchPage from './pages/SearchPage'
+import RecommendationsPage from './pages/RecommendationsPage'
+import GameDetailPage from './pages/GameDetailPage'
+
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-900">
-      <h1 className="text-4xl font-bold text-white">PlayNext 🎮</h1>
+    <div className="min-h-screen bg-gray-900">
+      <Routes>
+        <Route path="/" element={<SearchPage />} />
+        <Route path="/recommendations" element={<RecommendationsPage />} />
+        <Route path="/game/:id" element={<GameDetailPage />} />
+      </Routes>
     </div>
   )
 }

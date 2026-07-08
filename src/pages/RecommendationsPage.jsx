@@ -44,7 +44,7 @@ function RecommendationsPage() {
 
     //fetch games matching those genres
     const response = await fetch(
-      `https://api.rawg.io/api/games?key=${API_KEY}&genres=${topGenres}&page_size=20&ordering=-rating`
+      `https://api.rawg.io/api/games?key=${API_KEY}&genres=${topGenres}&page_size=40&ordering=-rating&metacritic=60,100`
     )
     const data = await response.json()
 

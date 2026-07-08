@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import SearchPage from './pages/SearchPage'
 import RecommendationsPage from './pages/RecommendationsPage'
 import GameDetailPage from './pages/GameDetailPage'
+import FavouritesPage from './pages/FavouritesPage'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<SearchPage />} />
+        <Route path="/favourites" element={<FavouritesPage />} />
         <Route path="/recommendations" element={<RecommendationsPage />} />
         <Route path="/game/:id" element={<GameDetailPage />} />
       </Routes>

@@ -22,6 +22,16 @@ function Navbar() {
           Search
         </Link>
         <Link
+          to="/favourites"
+          className={`text-sm font-medium transition-colors ${
+            location.pathname === '/favourites'
+              ? 'text-white'
+              : 'text-gray-500 hover:text-gray-300'
+          }`}
+        >
+          Saved {favourites.length > 0 && `(${favourites.length})`}
+        </Link>
+        <Link
           to="/recommendations"
           className={`text-sm font-medium transition-colors ${
             location.pathname === '/recommendations'
@@ -29,7 +39,7 @@ function Navbar() {
               : 'text-gray-500 hover:text-gray-300'
           }`}
         >
-          Recommendations {favourites.length > 0 && `(${favourites.length})`}
+          Recommendations
         </Link>
       </div>
     </nav>

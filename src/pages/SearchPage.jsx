@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useFavourites } from '../context/FavouritesContext'
+import { useNavigate } from 'react-router-dom'
 
 const API_KEY = import.meta.env.VITE_RAWG_API_KEY
 
@@ -8,7 +9,8 @@ function SearchPage() {
   const [games, setGames] = useState([])
   const [loading, setLoading] = useState(false)
   const { addFavourite, removeFavourite, isFavourite } = useFavourites()
-
+  const navigate = useNavigate()
+  
   const searchGames = async () => {
     if (!query) return
     setLoading(true)
@@ -52,7 +54,7 @@ function SearchPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {games.map((game) => (
-          <div key={game.id} className="bg-gray-800 rounded-lg overflow-hidden">
+          <div key={game.id} className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer" onClick={() => navigate(`/game/${game.id}`)}>
             <img
               src={game.background_image}
               alt={game.name}

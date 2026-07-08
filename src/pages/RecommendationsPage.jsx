@@ -94,18 +94,18 @@ function RecommendationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
-      <h1 className="text-4xl font-bold text-white mb-2">🎯 Recommendations</h1>
-      <p className="text-gray-400 mb-6">Based on your {favourites.length} saved game(s)</p>
+    <div className="max-w-6xl mx-auto px-8 py-10">
+      <h1 className="text-2xl font-semibold text-white mb-1">Recommended for you</h1>
+      <p className="text-gray-500 text-sm mb-6">Based on your {favourites.length} saved game(s)</p>
 
       {/* Genre Filter */}
       <div className="flex flex-wrap gap-2 mb-8">
         <button
           onClick={() => setSelectedGenre('All')}
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             selectedGenre === 'All'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              ? 'bg-white text-gray-900'
+              : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
           }`}
         >
           All
@@ -114,10 +114,10 @@ function RecommendationsPage() {
           <button
             key={genre.id}
             onClick={() => setSelectedGenre(genre.name)}
-            className={`px-4 py-2 rounded-full text-sm font-medium ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               selectedGenre === genre.name
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                ? 'bg-white text-gray-900'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
             {genre.name}
@@ -125,24 +125,24 @@ function RecommendationsPage() {
         ))}
       </div>
 
-      {loading && <p className="text-gray-400">Finding recommendations...</p>}
+      {loading && <p className="text-gray-500 text-sm">Finding recommendations...</p>}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {filtered.map((game) => (
           <div
             key={game.id}
-            className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-purple-500"
+            className="bg-gray-800 rounded-xl overflow-hidden cursor-pointer group"
             onClick={() => navigate(`/game/${game.id}`)}
           >
             <img
               src={game.background_image}
               alt={game.name}
-              className="w-full h-40 object-cover"
+              className="w-full h-36 object-cover group-hover:opacity-80 transition-opacity"
             />
-            <div className="p-4">
-              <h2 className="text-white font-semibold">{game.name}</h2>
-              <p className="text-gray-400 text-sm mt-1">⭐ {game.rating}</p>
-              <p className="text-purple-400 text-sm mt-1">🎯 {game.matchCount} genre match(es)</p>
+            <div className="p-3">
+              <h2 className="text-white text-sm font-medium leading-tight mb-1">{game.name}</h2>
+              <p className="text-gray-500 text-xs mb-1">⭐ {game.rating}</p>
+              <p className="text-gray-600 text-xs">🎯 {game.matchCount} genre match(es)</p>
             </div>
           </div>
         ))}

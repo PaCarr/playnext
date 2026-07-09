@@ -5,8 +5,11 @@ require('dotenv').config()
 
 const app = express()
 app.use(cors({
-  origin: ['https://playnext-six.vercel.app', 'http://localhost:5173']
+  origin: ['https://playnext-six.vercel.app', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
 }))
+app.options('*', cors())
 app.use(express.json())
 
 // Connect to MongoDB

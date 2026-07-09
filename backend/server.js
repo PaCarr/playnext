@@ -1,14 +1,20 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const cors = require('cors')
 require('dotenv').config()
 
 const app = express()
-app.use(cors({
-  origin: ['https://playnext-six.vercel.app', 'http://localhost:5173'],
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
-}))
+
+// Manual CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://playnext-six.vercel.app')
+  res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type')
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200)
+  }
+  next()
+})
+
 app.use(express.json())
 
 // Connect to MongoDB

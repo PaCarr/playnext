@@ -60,7 +60,7 @@ function GameDetailPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-8 py-8 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto px-8 py-8 overflow-x-hidden page-fade">
         <button
           onClick={() => navigate(-1)}
           className="text-gray-500 hover:text-gray-300 text-sm mb-8 block transition-colors"

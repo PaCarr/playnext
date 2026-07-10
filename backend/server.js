@@ -4,20 +4,20 @@ require('dotenv').config()
 
 const app = express()
 
-// Manual CORS headers
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://playnext-six.vercel.app')
+  const allowedOrigins = ['https://playnext-six.vercel.app', 'http://localhost:5173']
+  const origin = req.headers.origin
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin)
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type')
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200)
-  }
+  if (req.method === 'OPTIONS') return res.sendStatus(200)
   next()
 })
 
 app.use(express.json())
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
   family: 4
@@ -25,8 +25,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.log('MongoDB connection error:', err))
 
-// Favourite schema
 const favouriteSchema = new mongoose.Schema({
+  userId: String,
   gameId: Number,
   name: String,
   background_image: String,
@@ -36,15 +36,17 @@ const favouriteSchema = new mongoose.Schema({
 
 const Favourite = mongoose.model('Favourite', favouriteSchema)
 
-// Get all favourites
+// Get favourites for a user
 app.get('/api/favourites', async (req, res) => {
-  const favourites = await Favourite.find()
+  const { userId } = req.query
+  if (!userId) return res.json([])
+  const favourites = await Favourite.find({ userId })
   res.json(favourites)
 })
 
 // Add a favourite
 app.post('/api/favourites', async (req, res) => {
-  const existing = await Favourite.findOne({ gameId: req.body.gameId })
+  const existing = await Favourite.findOne({ userId: req.body.userId, gameId: req.body.gameId })
   if (existing) return res.json(existing)
   const favourite = new Favourite(req.body)
   await favourite.save()
@@ -53,7 +55,8 @@ app.post('/api/favourites', async (req, res) => {
 
 // Remove a favourite
 app.delete('/api/favourites/:gameId', async (req, res) => {
-  await Favourite.deleteOne({ gameId: Number(req.params.gameId) })
+  const { userId } = req.query
+  await Favourite.deleteOne({ userId, gameId: Number(req.params.gameId) })
   res.json({ success: true })
 })
 

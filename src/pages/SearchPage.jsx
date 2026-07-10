@@ -49,7 +49,7 @@ function SearchPage() {
   const isPopular = !hasSearched
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-10">
+    <div className="max-w-6xl mx-auto px-8 py-10 page-fade">
       <h1 className="text-2xl font-semibold text-white mb-1">Find your next game</h1>
       <p className="text-gray-500 text-sm mb-6">Search for games you enjoy and save them to get recommendations</p>
 
@@ -74,7 +74,12 @@ function SearchPage() {
         <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">Top Rated Games</p>
       )}
 
-      {loading && <p className="text-gray-500 text-sm">Searching...</p>}
+      {loading && (
+        <div className="flex items-center gap-3 text-gray-500 text-sm">
+          <div className="w-4 h-4 border-2 border-gray-600 border-t-white rounded-full animate-spin"></div>
+          Searching...
+        </div>
+      )}
 
       <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPopular ? 'opacity-70' : ''}`}>
         {displayGames.map((game) => (

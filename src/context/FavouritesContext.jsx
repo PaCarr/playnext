@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useAuth } from './AuthContext'
 
 const FavouritesContext = createContext()
 
@@ -6,20 +7,22 @@ const API_URL = 'https://playnext-production-2b7c.up.railway.app/api'
 
 export function FavouritesProvider({ children }) {
   const [favourites, setFavourites] = useState([])
+  const { user } = useAuth()
 
-  // Load favourites from backend on startup
   useEffect(() => {
-    fetch(`${API_URL}/favourites`)
+    if (!user) return
+    fetch(`${API_URL}/favourites?userId=${user.uid}`)
       .then((res) => res.json())
       .then((data) => setFavourites(data))
       .catch((err) => console.log('Error loading favourites:', err))
-  }, [])
+  }, [user])
 
   const addFavourite = async (game) => {
     const response = await fetch(`${API_URL}/favourites`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        userId: user.uid,
         gameId: game.id,
         name: game.name,
         background_image: game.background_image,
@@ -35,7 +38,7 @@ export function FavouritesProvider({ children }) {
   }
 
   const removeFavourite = async (gameId) => {
-    await fetch(`${API_URL}/favourites/${gameId}`, { method: 'DELETE' })
+    await fetch(`${API_URL}/favourites/${gameId}?userId=${user.uid}`, { method: 'DELETE' })
     setFavourites((prev) => prev.filter((g) => g.gameId !== gameId))
   }
 

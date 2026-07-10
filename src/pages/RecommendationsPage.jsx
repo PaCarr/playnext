@@ -86,9 +86,9 @@ function RecommendationsPage() {
 
   if (favourites.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-900 p-8">
-        <h1 className="text-4xl font-bold text-white mb-4"> Recommendations</h1>
-        <p className="text-gray-400">You haven't saved any games yet. Go to search and save some games you like!</p>
+      <div className="max-w-6xl mx-auto px-8 py-10 page-fade">
+        <h1 className="text-2xl font-semibold text-white mb-1">Recommended for you</h1>
+        <p className="text-gray-500 text-sm">You haven't saved any games yet — go to Search and save some games you like!</p>
       </div>
     )
   }

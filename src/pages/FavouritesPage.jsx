@@ -6,7 +6,7 @@ function FavouritesPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="max-w-6xl mx-auto px-8 py-10">
+    <div className="max-w-6xl mx-auto px-8 py-10 page-fade">
       <h1 className="text-2xl font-semibold text-white mb-1">Your Saved Games</h1>
       <p className="text-gray-500 text-sm mb-8">
         {favourites.length === 0

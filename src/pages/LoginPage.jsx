@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
@@ -14,6 +15,12 @@ function LoginPage() {
 
   const handleSubmit = async () => {
     setError('')
+
+    if (isSignUp && password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
     try {
       if (isSignUp) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password)
@@ -94,9 +101,18 @@ function LoginPage() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
               className="w-full px-4 py-2.5 rounded-lg bg-gray-900 text-white text-sm border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-600"
             />
+            {isSignUp && (
+              <input
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className="w-full px-4 py-2.5 rounded-lg bg-gray-900 text-white text-sm border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-600"
+              />
+            )}
           </div>
 
           {error && <p className="text-red-400 text-xs mt-3">{error}</p>}

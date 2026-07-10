@@ -43,7 +43,7 @@ function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && searchGames()}
-          className="flex-1 px-4 py-2.5 rounded-lg bg-gray-800 text-white text-sm border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-500"
+          className="flex-1 px-4 py-2.5 rounded-lg bg-gray-800 text-white text-base border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-500"
         />
         <button
           onClick={searchGames}

@@ -87,7 +87,7 @@ function RecommendationsPage() {
   if (favourites.length === 0) {
     return (
       <div className="min-h-screen bg-gray-900 p-8">
-        <h1 className="text-4xl font-bold text-white mb-4">🎯 Recommendations</h1>
+        <h1 className="text-4xl font-bold text-white mb-4"> Recommendations</h1>
         <p className="text-gray-400">You haven't saved any games yet. Go to search and save some games you like!</p>
       </div>
     )
@@ -142,7 +142,7 @@ function RecommendationsPage() {
             <div className="p-3">
               <h2 className="text-white text-sm font-medium leading-tight mb-1">{game.name}</h2>
               <p className="text-gray-500 text-xs mb-1">⭐ {game.rating}</p>
-              <p className="text-gray-600 text-xs">🎯 {game.matchCount} genre match(es)</p>
+              <p className="text-gray-600 text-xs"> {game.matchCount} genre match(es)</p>
             </div>
           </div>
         ))}

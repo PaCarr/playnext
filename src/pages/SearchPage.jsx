@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFavourites } from '../context/FavouritesContext'
 
@@ -7,13 +7,27 @@ const API_KEY = import.meta.env.VITE_RAWG_API_KEY
 function SearchPage() {
   const [query, setQuery] = useState('')
   const [games, setGames] = useState([])
+  const [popularGames, setPopularGames] = useState([])
   const [loading, setLoading] = useState(false)
+  const [hasSearched, setHasSearched] = useState(false)
   const { addFavourite, removeFavourite, isFavourite } = useFavourites()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchPopular = async () => {
+      const response = await fetch(
+        `https://api.rawg.io/api/games?key=${API_KEY}&ordering=-rating&page_size=8&metacritic=80,100`
+      )
+      const data = await response.json()
+      setPopularGames(data.results)
+    }
+    fetchPopular()
+  }, [])
 
   const searchGames = async () => {
     if (!query) return
     setLoading(true)
+    setHasSearched(true)
     const response = await fetch(
       `https://api.rawg.io/api/games?key=${API_KEY}&search=${query}&page_size=12`
     )
@@ -30,6 +44,9 @@ function SearchPage() {
       addFavourite(game)
     }
   }
+
+  const displayGames = hasSearched ? games : popularGames
+  const isPopular = !hasSearched
 
   return (
     <div className="max-w-6xl mx-auto px-8 py-10">
@@ -53,10 +70,14 @@ function SearchPage() {
         </button>
       </div>
 
+      {isPopular && (
+        <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">Top Rated Games</p>
+      )}
+
       {loading && <p className="text-gray-500 text-sm">Searching...</p>}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {games.map((game) => (
+      <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPopular ? 'opacity-70' : ''}`}>
+        {displayGames.map((game) => (
           <div
             key={game.id}
             className="bg-gray-800 rounded-xl overflow-hidden cursor-pointer group"
@@ -72,16 +93,18 @@ function SearchPage() {
             <div className="p-3">
               <h2 className="text-white text-sm font-medium leading-tight mb-1">{game.name}</h2>
               <p className="text-gray-500 text-xs mb-2">⭐ {game.rating}</p>
-              <button
-                onClick={(e) => handleFavourite(e, game)}
-                className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  isFavourite(game.id)
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'
-                }`}
-              >
-                {isFavourite(game.id) ? '♥ Saved' : '♡ Save'}
-              </button>
+              {!isPopular && (
+                <button
+                  onClick={(e) => handleFavourite(e, game)}
+                  className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    isFavourite(game.id)
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'
+                  }`}
+                >
+                  {isFavourite(game.id) ? '♥ Saved' : '♡ Save'}
+                </button>
+              )}
             </div>
           </div>
         ))}

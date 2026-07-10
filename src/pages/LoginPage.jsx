@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '../firebase'
 import { useNavigate } from 'react-router-dom'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
@@ -14,13 +16,31 @@ function LoginPage() {
     setError('')
     try {
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password)
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        await updateProfile(userCredential.user, {
+          displayName: `${firstName} ${lastName}`
+        })
       } else {
         await signInWithEmailAndPassword(auth, email, password)
       }
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      const code = err.code
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+        setError('Incorrect email or password. Please try again.')
+      } else if (code === 'auth/email-already-in-use') {
+        setError('An account with this email already exists.')
+      } else if (code === 'auth/weak-password') {
+        setError('Password must be at least 6 characters.')
+      } else if (code === 'auth/invalid-email') {
+        setError('Please enter a valid email address.')
+      } else if (code === 'auth/missing-password') {
+        setError('Please enter your password.')
+      } else if (code === 'auth/missing-email') {
+        setError('Please enter your email address.')
+      } else {
+        setError('Something went wrong. Please try again.')
+      }
     }
   }
 
@@ -30,7 +50,7 @@ function LoginPage() {
 
         {/* Branding */}
         <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>PlayNext</h1>
+          <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Orbitron, sans-serif' }}>PlayNext</h1>
           <p className="text-gray-500 text-sm">Discover your next favourite game</p>
         </div>
 
@@ -44,6 +64,24 @@ function LoginPage() {
           </p>
 
           <div className="space-y-3">
+            {isSignUp && (
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="First name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-1/2 px-4 py-2.5 rounded-lg bg-gray-900 text-white text-sm border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-600"
+                />
+                <input
+                  type="text"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-1/2 px-4 py-2.5 rounded-lg bg-gray-900 text-white text-sm border border-gray-700 focus:outline-none focus:border-gray-500 placeholder-gray-600"
+                />
+              </div>
+            )}
             <input
               type="email"
               placeholder="Email"
@@ -67,13 +105,16 @@ function LoginPage() {
             onClick={handleSubmit}
             className="w-full mt-5 py-2.5 bg-white text-gray-900 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"
           >
-            {isSignUp ? 'Sign up' : 'Sign in'}
+            {isSignUp ? 'Create account' : 'Sign in'}
           </button>
 
           <p className="text-gray-500 text-sm mt-4 text-center">
             {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button
-              onClick={() => setIsSignUp(!isSignUp)}
+              onClick={() => {
+                setIsSignUp(!isSignUp)
+                setError('')
+              }}
               className="text-white hover:underline"
             >
               {isSignUp ? 'Sign in' : 'Sign up'}

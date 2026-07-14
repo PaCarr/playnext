@@ -11,27 +11,25 @@ function SearchPage() {
   const [trendingGames, setTrendingGames] = useState([])
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
-  const { addFavourite, removeFavourite, isFavourite } = useFavourites()
+  const { addToSaved, addToWatchlist, removeGame, isSaved, isWatchlisted } = useFavourites()
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchGames = async () => {
-      // Top rated games
       const popularRes = await fetch(
         `https://api.rawg.io/api/games?key=${API_KEY}&ordering=-rating&page_size=8&metacritic=80,100`
       )
       const popularData = await popularRes.json()
       setPopularGames(popularData.results)
 
-      // Trending - recently released with high ratings
       const today = new Date()
       const sixMonthsAgo = new Date()
       sixMonthsAgo.setFullYear(today.getFullYear() - 1)
       const fromDate = sixMonthsAgo.toISOString().split('T')[0]
       const toDate = today.toISOString().split('T')[0]
 
-     const trendingRes = await fetch(
-      `https://api.rawg.io/api/games?key=${API_KEY}&ordering=-released&page_size=8&dates=${fromDate},${toDate}&ordering=-rating`
+      const trendingRes = await fetch(
+        `https://api.rawg.io/api/games?key=${API_KEY}&ordering=-released&page_size=8&dates=${fromDate},${toDate}&ordering=-rating`
       )
       const trendingData = await trendingRes.json()
       setTrendingGames(trendingData.results)
@@ -51,12 +49,21 @@ function SearchPage() {
     setLoading(false)
   }
 
-  const handleFavourite = (e, game) => {
+  const handleSave = (e, game) => {
     e.stopPropagation()
-    if (isFavourite(game.id)) {
-      removeFavourite(game.id)
+    if (isSaved(game.id)) {
+      removeGame(game.id)
     } else {
-      addFavourite(game)
+      addToSaved(game)
+    }
+  }
+
+  const handleWatchlist = (e, game) => {
+    e.stopPropagation()
+    if (isWatchlisted(game.id)) {
+      removeGame(game.id)
+    } else {
+      addToWatchlist(game)
     }
   }
 
@@ -151,16 +158,28 @@ function SearchPage() {
                 <div className="p-3">
                   <h2 className="text-white text-sm font-medium leading-tight mb-1">{game.name}</h2>
                   <p className="text-gray-500 text-xs mb-2">⭐ {game.rating}</p>
-                  <button
-                    onClick={(e) => handleFavourite(e, game)}
-                    className={`w-full py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                      isFavourite(game.id)
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'
-                    }`}
-                  >
-                    {isFavourite(game.id) ? '♥ Saved' : '♡ Save'}
-                  </button>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={(e) => handleSave(e, game)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        isSaved(game.id)
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'
+                      }`}
+                    >
+                      {isSaved(game.id) ? '✓ Played' : 'Played'}
+                    </button>
+                    <button
+                      onClick={(e) => handleWatchlist(e, game)}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                        isWatchlisted(game.id)
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-white'
+                      }`}
+                    >
+                      {isWatchlisted(game.id) ? '✓ Wanted' : 'Want to Play'}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

@@ -9,7 +9,7 @@ function GameDetailPage() {
   const navigate = useNavigate()
   const [game, setGame] = useState(null)
   const [loading, setLoading] = useState(true)
-  const { addFavourite, removeFavourite, isFavourite } = useFavourites()
+  const { addToSaved, addToWatchlist, removeGame, isSaved, isWatchlisted } = useFavourites()
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -22,14 +22,6 @@ function GameDetailPage() {
     }
     fetchGame()
   }, [id])
-
-  const handleFavourite = () => {
-    if (isFavourite(game.id)) {
-      removeFavourite(game.id)
-    } else {
-      addFavourite(game)
-    }
-  }
 
   if (loading) return <p className="text-gray-500 text-sm p-8">Loading...</p>
   if (!game) return <p className="text-gray-500 text-sm p-8">Game not found.</p>
@@ -46,16 +38,28 @@ function GameDetailPage() {
               <h1 className="text-3xl font-semibold text-white">{game.name}</h1>
               <p className="text-gray-300 text-sm mt-1">⭐ {game.rating} / 5</p>
             </div>
-            <button
-              onClick={handleFavourite}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
-                isFavourite(game.id)
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-gray-900 hover:bg-gray-100'
-              }`}
-            >
-              {isFavourite(game.id) ? '♥ Saved' : '♡ Save game'}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => isSaved(game.id) ? removeGame(game.id) : addToSaved(game)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  isSaved(game.id)
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                {isSaved(game.id) ? '✓ Played' : 'Played'}
+              </button>
+              <button
+                onClick={() => isWatchlisted(game.id) ? removeGame(game.id) : addToWatchlist(game)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                  isWatchlisted(game.id)
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                }`}
+              >
+                {isWatchlisted(game.id) ? '✓ Wanted' : 'Want to Play'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

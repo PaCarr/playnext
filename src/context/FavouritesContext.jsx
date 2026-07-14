@@ -6,19 +6,30 @@ const FavouritesContext = createContext()
 const API_URL = 'https://playnext-production-2b7c.up.railway.app/api'
 
 export function FavouritesProvider({ children }) {
-  const [favourites, setFavourites] = useState([])
+  const [saved, setSaved] = useState([])
+  const [watchlist, setWatchlist] = useState([])
   const { user } = useAuth()
 
   useEffect(() => {
     if (!user) return
     fetch(`${API_URL}/favourites?userId=${user.uid}`)
       .then((res) => res.json())
-      .then((data) => setFavourites(data))
+      .then((data) => {
+        setSaved(data.filter((g) => g.listType === 'saved' || !g.listType))
+        setWatchlist(data.filter((g) => g.listType === 'watchlist'))
+      })
       .catch((err) => console.log('Error loading favourites:', err))
   }, [user])
 
-const addFavourite = async (game) => {
-    // Fetch full game details including tags
+  const addToSaved = async (game) => {
+    await addGame(game, 'saved')
+  }
+
+  const addToWatchlist = async (game) => {
+    await addGame(game, 'watchlist')
+  }
+
+  const addGame = async (game, listType) => {
     const detailsResponse = await fetch(
       `https://api.rawg.io/api/games/${game.id}?key=${import.meta.env.VITE_RAWG_API_KEY}`
     )
@@ -36,26 +47,38 @@ const addFavourite = async (game) => {
         genres: fullGame.genres || game.genres,
         tags: fullGame.tags || [],
         developers: fullGame.developers || [],
+        listType,
       }),
     })
-    const saved = await response.json()
-    setFavourites((prev) => {
-      if (prev.find((g) => g.gameId === saved.gameId)) return prev
-      return [...prev, saved]
-    })
+    const savedGame = await response.json()
+
+    if (listType === 'saved') {
+      setSaved((prev) => {
+        if (prev.find((g) => g.gameId === savedGame.gameId)) return prev
+        return [...prev, savedGame]
+      })
+    } else {
+      setWatchlist((prev) => {
+        if (prev.find((g) => g.gameId === savedGame.gameId)) return prev
+        return [...prev, savedGame]
+      })
+    }
   }
 
-  const removeFavourite = async (gameId) => {
+  const removeGame = async (gameId) => {
     await fetch(`${API_URL}/favourites/${gameId}?userId=${user.uid}`, { method: 'DELETE' })
-    setFavourites((prev) => prev.filter((g) => g.gameId !== gameId))
+    setSaved((prev) => prev.filter((g) => g.gameId !== gameId))
+    setWatchlist((prev) => prev.filter((g) => g.gameId !== gameId))
   }
 
-  const isFavourite = (gameId) => {
-    return favourites.some((g) => g.gameId === gameId)
-  }
+  const isSaved = (gameId) => saved.some((g) => g.gameId === gameId)
+  const isWatchlisted = (gameId) => watchlist.some((g) => g.gameId === gameId)
+
+  // Keep favourites as saved for recommendations compatibility
+  const favourites = saved
 
   return (
-    <FavouritesContext.Provider value={{ favourites, addFavourite, removeFavourite, isFavourite }}>
+    <FavouritesContext.Provider value={{ favourites, saved, watchlist, addToSaved, addToWatchlist, removeGame, isSaved, isWatchlisted }}>
       {children}
     </FavouritesContext.Provider>
   )

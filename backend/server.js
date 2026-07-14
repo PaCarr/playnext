@@ -34,6 +34,7 @@ const favouriteSchema = new mongoose.Schema({
   genres: Array,
   tags: Array,
   developers: Array,
+  listType: { type: String, default: 'saved' },
 })
 
 const Favourite = mongoose.model('Favourite', favouriteSchema)

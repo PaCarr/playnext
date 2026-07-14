@@ -3,7 +3,7 @@ import { useFavourites } from '../context/FavouritesContext'
 import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-  const { favourites } = useFavourites()
+  const { saved, watchlist } = useFavourites()
   const { user, logout } = useAuth()
   const location = useLocation()
 
@@ -27,7 +27,7 @@ function Navbar() {
             location.pathname === '/favourites' ? 'text-white' : 'text-gray-500 hover:text-gray-300'
           }`}
         >
-          Saved {favourites.length > 0 && `(${favourites.length})`}
+          Saved {(saved.length + watchlist.length) > 0 && `(${saved.length + watchlist.length})`}
         </Link>
         <Link
           to="/recommendations"

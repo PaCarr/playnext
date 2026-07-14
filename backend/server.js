@@ -32,6 +32,7 @@ const favouriteSchema = new mongoose.Schema({
   background_image: String,
   rating: Number,
   genres: Array,
+  tags: Array,
 })
 
 const Favourite = mongoose.model('Favourite', favouriteSchema)

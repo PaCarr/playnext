@@ -17,23 +17,37 @@ function RecommendationsPage() {
     getRecommendations()
   }, [favourites])
 
-  const getRecommendations = async () => {
+const getRecommendations = async () => {
     setLoading(true)
 
-    //collect all genres from saved games
+    // Collect genres from saved games
     const genreMap = {}
+    const tagMap = {}
+
     favourites.forEach((game) => {
       if (game.genres) {
         game.genres.forEach((genre) => {
           genreMap[genre.id] = (genreMap[genre.id] || 0) + 1
         })
       }
+      if (game.tags) {
+        game.tags.forEach((tag) => {
+          tagMap[tag.id] = (tagMap[tag.id] || 0) + 1
+        })
+      }
     })
 
-    //get the top 3 most common genres
+    // Get top 3 genres
     const topGenres = Object.entries(genreMap)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
+      .slice(0, 5)
+      .map(([id]) => id)
+      .join(',')
+
+    // Get top 5 tags
+    const topTags = Object.entries(tagMap)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
       .map(([id]) => id)
       .join(',')
 
@@ -42,28 +56,32 @@ function RecommendationsPage() {
       return
     }
 
-    //fetch games matching those genres
+   // Fetch games matching top genres only, use tags for scoring
     const response = await fetch(
       `https://api.rawg.io/api/games?key=${API_KEY}&genres=${topGenres}&page_size=40&ordering=-rating&metacritic=60,100`
     )
     const data = await response.json()
 
-    // Step 4: filter out already saved games
+    // Filter out already saved games
     const savedIds = favourites.map((g) => g.gameId)
     const filtered = data.results.filter((g) => !savedIds.includes(g.id))
 
-    // Step 5: score each game by how many top genres it matches
+    // Score each game by genre AND tag matches
     const scored = filtered.map((game) => {
-      const matchCount = game.genres
+      const genreMatch = game.genres
         ? game.genres.filter((genre) => topGenres.includes(String(genre.id))).length
         : 0
+      const tagMatch = game.tags
+        ? game.tags.filter((tag) => topTags.includes(String(tag.id))).length
+        : 0
+      const matchCount = genreMatch + tagMatch
       return { ...game, matchCount }
     })
 
-    //sort by match score
+    // Sort by total match score
     scored.sort((a, b) => b.matchCount - a.matchCount)
 
-    //collect all unique genres from results for the filter
+    // Collect unique genres for filter
     const allGenres = []
     scored.forEach((game) => {
       game.genres?.forEach((genre) => {
@@ -72,6 +90,7 @@ function RecommendationsPage() {
         }
       })
     })
+
     setAvailableGenres(allGenres)
     setRecommendations(scored)
     setLoading(false)

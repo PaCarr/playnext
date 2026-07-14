@@ -35,6 +35,7 @@ const addFavourite = async (game) => {
         rating: game.rating,
         genres: fullGame.genres || game.genres,
         tags: fullGame.tags || [],
+        developers: fullGame.developers || [],
       }),
     })
     const saved = await response.json()

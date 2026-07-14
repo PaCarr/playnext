@@ -33,6 +33,7 @@ const favouriteSchema = new mongoose.Schema({
   rating: Number,
   genres: Array,
   tags: Array,
+  developers: Array,
 })
 
 const Favourite = mongoose.model('Favourite', favouriteSchema)

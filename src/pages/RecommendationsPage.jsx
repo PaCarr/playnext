@@ -74,6 +74,8 @@ function RecommendationsPage() {
       const savedTagIds = new Set(savedGame.tags?.map((t) => String(t.id)) || [])
       const savedGenreIds = new Set(savedGame.genres?.map((g) => String(g.id)) || [])
 
+     const savedDevIds = new Set(savedGame.developers?.map((d) => String(d.id)) || [])
+
       const scored = filtered.map((game) => {
         const tagScore = game.tags
           ? game.tags.filter((t) => savedTagIds.has(String(t.id))).length * 2
@@ -81,8 +83,11 @@ function RecommendationsPage() {
         const genreScore = game.genres
           ? game.genres.filter((g) => savedGenreIds.has(String(g.id))).length
           : 0
+        const devScore = game.developers
+          ? game.developers.filter((d) => savedDevIds.has(String(d.id))).length * 3
+          : 0
         const ratingBoost = game.rating / 5
-        const totalScore = tagScore + genreScore + ratingBoost
+        const totalScore = tagScore + genreScore + devScore + ratingBoost
         return { ...game, totalScore }
       })
 

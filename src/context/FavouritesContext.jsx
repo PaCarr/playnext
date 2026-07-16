@@ -21,19 +21,33 @@ export function FavouritesProvider({ children }) {
       .catch((err) => console.log('Error loading favourites:', err))
   }, [user])
 
-  const addToSaved = async (game) => {
-    await addGame(game, 'saved')
-  }
-
-  const addToWatchlist = async (game) => {
-    await addGame(game, 'watchlist')
-  }
-
   const addGame = async (game, listType) => {
     const detailsResponse = await fetch(
       `https://api.rawg.io/api/games/${game.id}?key=${import.meta.env.VITE_RAWG_API_KEY}`
     )
     const fullGame = await detailsResponse.json()
+
+    // If marking as played, store in our own games collection
+    if (listType === 'saved') {
+      fetch(`${API_URL}/games`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameId: fullGame.id,
+          name: fullGame.name,
+          background_image: fullGame.background_image,
+          rating: fullGame.rating,
+          metacritic: fullGame.metacritic,
+          released: fullGame.released,
+          playtime: fullGame.playtime,
+          description_raw: fullGame.description_raw,
+          genres: fullGame.genres,
+          tags: fullGame.tags,
+          developers: fullGame.developers,
+          platforms: fullGame.platforms,
+        })
+      }).catch(() => {})
+    }
 
     const response = await fetch(`${API_URL}/favourites`, {
       method: 'POST',
@@ -65,6 +79,14 @@ export function FavouritesProvider({ children }) {
     }
   }
 
+  const addToSaved = async (game) => {
+    await addGame(game, 'saved')
+  }
+
+  const addToWatchlist = async (game) => {
+    await addGame(game, 'watchlist')
+  }
+
   const removeGame = async (gameId) => {
     await fetch(`${API_URL}/favourites/${gameId}?userId=${user.uid}`, { method: 'DELETE' })
     setSaved((prev) => prev.filter((g) => g.gameId !== gameId))
@@ -74,7 +96,6 @@ export function FavouritesProvider({ children }) {
   const isSaved = (gameId) => saved.some((g) => g.gameId === gameId)
   const isWatchlisted = (gameId) => watchlist.some((g) => g.gameId === gameId)
 
-  // Keep favourites as saved for recommendations compatibility
   const favourites = saved
 
   return (
